@@ -20,24 +20,26 @@
             <div class="status-indicator disconnected" id="status-indicator"></div>
             <span id="status-text">Desconectado</span>
         </div>
+
+
         <!--Esta parte es para la configuración del cliente MQTT-->
         <div class="config-panel">
             <h2>Configuración MQTT</h2>
             <div class="form-group">
                 <label for="broker-host">Broker MQTT:</label>
-                <input type="text" id="broker-host" value="broker.hivemq.com" placeholder="mqtt://broker.url.com">
+                <input type="text" id="broker-host" value="broker.emqx.io" placeholder="mqtt://broker.url.com">
             </div>
             <div class="form-group">
                 <label for="broker-port">Puerto:</label>
-                <input type="number" id="broker-port" value="8884" placeholder="8884">
+                <input type="number" id="broker-port" value="8084" placeholder="8884">
             </div>
-            <div class="form-group">
-                <label for="client-id">Client ID:</label>
-                <input type="text" id="client-id" value="web-client-" placeholder="ID único del cliente">
-            </div>
+
+
             <button class="btn btn-primary" id="connect-btn">Conectar</button>
             <button class="btn btn-danger" id="disconnect-btn">Desconectar</button>
         </div>
+
+
         <!-- Esta parte es para ver la temperatura y humedad del dht11/22
         ademas tiene un histograma -->
         <div class="dashboard">

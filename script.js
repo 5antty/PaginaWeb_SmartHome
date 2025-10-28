@@ -46,11 +46,18 @@ function initChart() {
 function connectToBroker() {
   const host = document.getElementById("broker-host").value;
   const port = parseInt(document.getElementById("broker-port").value);
-  const clientId =
-    document.getElementById("client-id").value +
-    Math.random().toString(16).substring(2, 8);
+  const clientId = Math.floor(Math.random() * 1000);
 
-  client = new Paho.MQTT.Client(host, port, clientId);
+  console.log(
+    "Connecting to broker at " +
+      host +
+      ":" +
+      port +
+      " with Client ID: " +
+      clientId
+  );
+
+  client = new Paho.Client(host, port, "clientId");
 
   client.onConnectionLost = onConnectionLost;
   client.onMessageArrived = onMessageArrived;
@@ -138,7 +145,7 @@ function publishMessage(topic, message) {
     return;
   }
 
-  const mqttMessage = new Paho.MQTT.Message(message);
+  const mqttMessage = new Paho.Message(message);
   mqttMessage.destinationName = topic;
   client.send(mqttMessage);
   addMessageToLog("Mensaje enviado: [" + topic + "] " + message);
@@ -161,7 +168,7 @@ function updateConnectionStatus(connected) {
 
 // Añadir mensaje al log
 function addMessageToLog(message) {
-  const now = new Date();//Esto se deberuia cambiar por la hora del RTC del esp32
+  const now = new Date(); //Esto se deberuia cambiar por la hora del RTC del esp32
   const timeString = now.toLocaleTimeString();
   const messageElement = document.createElement("p");
   messageElement.textContent = `[${timeString}] ${message}`;
