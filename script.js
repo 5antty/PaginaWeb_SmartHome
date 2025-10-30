@@ -79,11 +79,15 @@ function onConnect() {
   addMessageToLog("Conectado al broker MQTT");
 
   // Suscribirse a los temas
-  client.subscribe("esp32/temperature");
-  client.subscribe("esp32/humidity");
-  client.subscribe("esp32/status");
+  client.subscribe("smarthome/web/temp");
+  client.subscribe("smarthome/web/hum");
+  client.subscribe("smarthome/web/luz1");
+  client.subscribe("smarthome/web/luz2");
+  client.subscribe("smarthome/web/caloventor");
+  client.subscribe("smarthome/web/ventilador");
+  client.subscribe("smarthome/web/alarma");
   addMessageToLog(
-    "Suscrito a temas: esp32/temperature, esp32/humidity, esp32/status"
+    "Suscrito a temas: smarthome/web/temp, smarthome/web/hum, smarthome/web/luz1, smarthome/web/luz2, smarthome/web/caloventor, smarthome/web/ventilador, smarthome/web/alarma"
   );
 }
 
@@ -103,16 +107,16 @@ function onConnectionLost(responseObject) {
 
 // Callback de mensaje recibido
 function onMessageArrived(message) {
-  addMessageToLog(
+  /* addMessageToLog(
     "Mensaje recibido: [" +
       message.destinationName +
       "] " +
       message.payloadString
-  );
+  ); */
 
   // Procesar según el topic
   switch (message.destinationName) {
-    case "esp32/temperature":
+    case "smarthome/web/temp":
       const temp = parseFloat(message.payloadString);
       temperatureEl.textContent = temp.toFixed(1);
 
@@ -128,12 +132,45 @@ function onMessageArrived(message) {
       temperatureChart.update();
       break;
 
-    case "esp32/humidity":
+    case "smarthome/web/hum":
       humidityEl.textContent = parseFloat(message.payloadString).toFixed(1);
       break;
 
-    case "esp32/alarma":
-      // Procesar estado del dispositivo
+    case "smarthome/web/luz1":
+      if (message.payloadString === "ON") {
+        addMessageToLog("Estado de luz 1 => encendida");
+      } else if (message.payloadString === "OFF") {
+        addMessageToLog("Estado de luz 1 => apagada");
+      } else {
+        addMessageToLog("Estado de luz 1 => desconocido");
+      }
+      break;
+    case "smarthome/web/luz2":
+      if (message.payloadString === "ON") {
+        addMessageToLog("Estado de luz 2 => encendida");
+      } else if (message.payloadString === "OFF") {
+        addMessageToLog("Estado de luz 2 => apagada");
+      } else {
+        addMessageToLog("Estado de luz 2 => desconocido");
+      }
+      break;
+    case "smarthome/web/caloventor":
+      if (message.payloadString === "ON") {
+        addMessageToLog("Estado de caloventor => encendido");
+      } else if (message.payloadString === "OFF") {
+        addMessageToLog("Estado de caloventor => apagado");
+      } else {
+        addMessageToLog("Estado de caloventor => desconocido");
+      }
+      break;
+    case "smarthome/web/alarma":
+      if (message.payloadString === "ON") {
+        addMessageToLog("Estado de alarma => activada");
+      } else if (message.payloadString === "OFF") {
+        addMessageToLog("Estado de alarma => desactivada");
+      } else {
+        addMessageToLog("Estado de alarma => desconocido");
+      }
       break;
   }
 }
@@ -190,24 +227,58 @@ disconnectBtn.addEventListener("click", function () {
   }
 });
 
-// Controles de dispositivos
-document.getElementById("led-on").addEventListener("click", function () {
-  publishMessage("esp32/relay_luz", "ON");
-});
+/*
+  Envio de mensajes para que el ESP32 controle los dispositivos
+*/
+const deviceStates = {
+  luz1: false,
+  luz2: false,
+  caloventor: false,
+  ventilador: false,
+  alarma: false,
+};
 
-document.getElementById("led-off").addEventListener("click", function () {
-  publishMessage("esp32/relay_luz", "OFF");
-});
+function cambioEstado(event, topic) {
+  const boton = event.currentTarget;
 
+  if (!isConnected) return;
+
+  // Cambiar el estado global
+
+  const state = deviceStates[topic];
+
+  if (state) {
+    boton.classList.remove("btn-danger");
+    boton.classList.add("btn-success");
+    boton.textContent =
+      boton.textContent.split(" ").slice(0, -1).join(" ") + " encendida";
+    publishMessage(`smarthome/esp32/${topic}`, "ON");
+  } else {
+    boton.classList.remove("btn-success");
+    boton.classList.add("btn-danger");
+    boton.textContent =
+      boton.textContent.split(" ").slice(0, -1).join(" ") + " apagada";
+    publishMessage(`smarthome/esp32/${topic}`, "OFF");
+  }
+  deviceStates[topic] = !deviceStates[topic];
+}
+
+document
+  .getElementById("luz1")
+  .addEventListener("click", (e) => cambioEstado(e, "luz1"));
+document
+  .getElementById("luz2")
+  .addEventListener("click", (e) => cambioEstado(e, "luz2"));
+document
+  .getElementById("calo")
+  .addEventListener("click", (e) => cambioEstado(e, "caloventor"));
+document
+  .getElementById("venti")
+  .addEventListener("click", (e) => cambioEstado(e, "ventilador"));
+document
+  .getElementById("alarma")
+  .addEventListener("click", (e) => cambioEstado(e, "alarma"));
 //Falta ver como imlpementamos la configuracion de la alarma
-
-document.getElementById("alarma-on").addEventListener("click", function () {
-  publishMessage("esp32/alarma", "ON");
-});
-
-document.getElementById("alarma-off").addEventListener("click", function () {
-  publishMessage("esp32/alarma", "OFF");
-});
 
 // Inicializar la aplicación
 window.onload = function () {

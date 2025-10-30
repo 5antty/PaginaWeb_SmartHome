@@ -12,7 +12,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Controlador ESP32/8266 via MQTT</h1>
+            <h1>Controlador ESP32 via MQTT</h1>
             <p class="subtitle">Monitoreo y control en tiempo "real"</p>
         </header>
         <!--Esta parte es para saber el estado de la conexión MQTT-->
@@ -45,7 +45,7 @@
         <div class="dashboard">
             <div class="card">
                 <h2 class="card-title">
-                    <i>📊</i> Datos del Sensor
+                    <i>📊</i> Datos del Sensor de temperatura y humedad
                 </h2>
                 <div class="data-display">
                     <div class="data-item">
@@ -68,14 +68,21 @@
                 <h2 class="card-title">
                     <i>⚙️</i> Controles
                 </h2>
-                <p>Gestiona los dispositivos conectados al ESP32</p>
-    
+                <p>Gestiona los dispositivos conectados al sistema de domótica</p>
+
+                <!--Esto se podria mejorar con iconos-->
                 <div class="controls">
-                    <button class="btn btn-success" id="led-on">Encender Luz</button>
-                    <button class="btn btn-danger" id="led-off">Apagar Luz</button>
-                    <button class="btn btn-primary" id="alarma-conf">Configurar Alarma</button>
-                    <button class="btn btn-success" id="alarma-on">Encender Alarma</button>
-                    <button class="btn btn-danger" id="alarma-off">Desactivar Alarma</button>
+                    <!--<button class="btn btn-danger" id="prueba">Prueba apagada</button>-->
+
+                    <button class="btn btn-danger" id="luz1">Luz 1 apagada</button>
+
+                    <button class="btn btn-danger" id="luz2">Luz 2 apagada</button>
+
+                    <button class="btn btn-danger" id="calo">Caloventor apagado</button>
+
+                    <button class="btn btn-danger" id="venti">Ventilador apagado</button>
+                    <!--<button class="btn btn-primary" id="alarma-conf">Configurar Alarma</button>-->
+                    <button class="btn btn-danger" id="alarma">Alarma desactivada</button>
                 </div>
     
                 <h3>Mensajes Recibidos</h3>
@@ -87,7 +94,7 @@
         </div>
     
         <footer>
-            <p>Prototipo de Aplicación Web para control de ESP32/8266 via MQTT</p>
+            <p>Prototipo de Aplicación Web para control de domótica del sistema SmartHome via MQTT</p>
         </footer>
     </div>
     <script src="./script.js"></script>
