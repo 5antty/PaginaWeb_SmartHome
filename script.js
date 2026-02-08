@@ -13,6 +13,27 @@ const temperatureEl = document.getElementById("temperature");
 const humidityEl = document.getElementById("humidity");
 const messageLog = document.getElementById("message-log");
 
+const slider1 = document.getElementById("sliderLuz1");
+const valor1 = document.getElementById("valorLuz1");
+
+slider1.addEventListener("input", () => {
+  valor1.textContent = slider1.value;
+
+  // Ejemplo: enviar a backend / ESP / API
+  // enviarNivelLuz(slider.value);
+  publishMessage("smarthome/esp32/slide1", slider1.value);
+});
+
+const slider2 = document.getElementById("sliderLuz2");
+const valor2 = document.getElementById("valorLuz2");
+
+slider2.addEventListener("input", () => {
+  valor2.textContent = slider2.value;
+  // Ejemplo: enviar a backend / ESP / API
+  // enviarNivelLuz(slider.value);
+  publishMessage("smarthome/esp32/slide2", slider2.value);
+});
+
 // Inicializar gráfico
 function initChart() {
   const ctx = document.getElementById("temperature-chart").getContext("2d");
@@ -54,7 +75,7 @@ function connectToBroker() {
       ":" +
       port +
       " with Client ID: " +
-      clientId
+      clientId,
   );
 
   client = new Paho.Client(host, port, "clientId");
@@ -87,7 +108,7 @@ function onConnect() {
   client.subscribe("smarthome/web/ventilador");
   client.subscribe("smarthome/web/alarma");
   addMessageToLog(
-    "Suscrito a temas: smarthome/web/temp, smarthome/web/hum, smarthome/web/luz1, smarthome/web/luz2, smarthome/web/caloventor, smarthome/web/ventilador, smarthome/web/alarma"
+    "Suscrito a temas: smarthome/web/temp, smarthome/web/hum, smarthome/web/luz1, smarthome/web/luz2, smarthome/web/caloventor, smarthome/web/ventilador, smarthome/web/alarma",
   );
 }
 
@@ -126,7 +147,7 @@ function onMessageArrived(message) {
 
       temperatureChart.data.labels = Array.from(
         { length: temperatureData.length },
-        (_, i) => i + 1
+        (_, i) => i + 1,
       );
       temperatureChart.data.datasets[0].data = temperatureData;
       temperatureChart.update();
