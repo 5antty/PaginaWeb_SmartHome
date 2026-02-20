@@ -158,30 +158,77 @@ function onMessageArrived(message) {
       break;
 
     case "smarthome/web/luz1":
+      const luz1 = document.getElementById("luz1");
       if (message.payloadString === "ON") {
         addMessageToLog("Estado de luz 1 => encendida");
+        luz1.classList.remove("btn-danger");
+        luz1.classList.add("btn-success");
+        luz1.textContent =
+          luz1.textContent.split(" ").slice(0, -1).join(" ") + " encendida";
       } else if (message.payloadString === "OFF") {
         addMessageToLog("Estado de luz 1 => apagada");
+        luz1.classList.remove("btn-success");
+        luz1.classList.add("btn-danger");
+        luz1.textContent =
+          luz1.textContent.split(" ").slice(0, -1).join(" ") + " apagada";
       } else {
         addMessageToLog("Estado de luz 1 => desconocido");
       }
       break;
     case "smarthome/web/luz2":
+      const luz2 = document.getElementById("luz2");
       if (message.payloadString === "ON") {
         addMessageToLog("Estado de luz 2 => encendida");
+        luz2.classList.remove("btn-danger");
+        luz2.classList.add("btn-success");
+        luz2.textContent =
+          luz2.textContent.split(" ").slice(0, -1).join(" ") + " encendida";
       } else if (message.payloadString === "OFF") {
         addMessageToLog("Estado de luz 2 => apagada");
+        luz2.classList.remove("btn-success");
+        luz2.classList.add("btn-danger");
+        luz2.textContent =
+          luz2.textContent.split(" ").slice(0, -1).join(" ") + " apagada";
       } else {
         addMessageToLog("Estado de luz 2 => desconocido");
       }
       break;
     case "smarthome/web/caloventor":
+      const caloventor = document.getElementById("caloventor");
       if (message.payloadString === "ON") {
         addMessageToLog("Estado de caloventor => encendido");
+        caloventor.classList.remove("btn-danger");
+        caloventor.classList.add("btn-success");
+        caloventor.textContent =
+          caloventor.textContent.split(" ").slice(0, -1).join(" ") +
+          " encendido";
       } else if (message.payloadString === "OFF") {
         addMessageToLog("Estado de caloventor => apagado");
+        caloventor.classList.remove("btn-success");
+        caloventor.classList.add("btn-danger");
+        caloventor.textContent =
+          caloventor.textContent.split(" ").slice(0, -1).join(" ") + " apagado";
       } else {
         addMessageToLog("Estado de caloventor => desconocido");
+      }
+      break;
+    case "smarthome/web/ventilador":
+      const ventilador = document.getElementById("ventilador");
+      if (message.payloadString === "ON") {
+        addMessageToLog("Estado de ventilador => encendido");
+        ventilador.classList.remove("btn-danger");
+        ventilador.classList.add("btn-success");
+        ventilador.textContent =
+          ventilador.textContent.split(" ").slice(0, -1).join(" ") +
+          " encendido";
+      } else if (message.payloadString === "OFF") {
+        addMessageToLog("Estado de ventilador => apagado");
+        ventilador.classList.remove("btn-success");
+        ventilador.classList.add("btn-danger");
+        ventilador.textContent =
+          ventilador.textContent.split(" ").slice(0, -1).join(" ") + " apagado";
+      } else {
+        addMessageToLog("Estado de ventilador => desconocido");
       }
       break;
     case "smarthome/web/alarma":
