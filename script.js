@@ -75,8 +75,8 @@ function connectToBroker() {
   const host = document.getElementById("broker-host").value;
   const port = parseInt(document.getElementById("broker-port").value);
   const clientId = Math.floor(Math.random() * 1000);
-  const user = document.getElementById("broker-user").value;
-  const password = document.getElementById("broker-password").value;
+  //const user = document.getElementById("broker-user").value;
+  //const password = document.getElementById("broker-password").value;
 
   client = new Paho.Client(host, port, "web_" + clientId);
 
@@ -87,9 +87,7 @@ function connectToBroker() {
     timeout: 3,
     onSuccess: onConnect,
     onFailure: onFailure,
-    useSSL: false,
-    userName: user, // ← agregar
-    password: password, // ← agregar
+    useSSL: true,
   };
 
   client.connect(options);
