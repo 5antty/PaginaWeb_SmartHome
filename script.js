@@ -34,6 +34,13 @@ slider2.addEventListener("input", () => {
   publishMessage("smarthome/esp32/slide2", slider2.value);
 });
 
+function actualizarSlider(sliderId, valorId, valor) {
+  const slider = document.getElementById(sliderId);
+  const label = document.getElementById(valorId);
+  slider.value = valor;
+  label.textContent = valor;
+}
+
 // Inicializar gráfico
 function initChart() {
   const ctx = document.getElementById("temperature-chart").getContext("2d");
@@ -68,17 +75,10 @@ function connectToBroker() {
   const host = document.getElementById("broker-host").value;
   const port = parseInt(document.getElementById("broker-port").value);
   const clientId = Math.floor(Math.random() * 1000);
+  const user = document.getElementById("broker-user").value;
+  const password = document.getElementById("broker-password").value;
 
-  console.log(
-    "Connecting to broker at " +
-      host +
-      ":" +
-      port +
-      " with Client ID: " +
-      clientId,
-  );
-
-  client = new Paho.Client(host, port, "clientId");
+  client = new Paho.Client(host, port, "web_" + clientId);
 
   client.onConnectionLost = onConnectionLost;
   client.onMessageArrived = onMessageArrived;
@@ -87,7 +87,9 @@ function connectToBroker() {
     timeout: 3,
     onSuccess: onConnect,
     onFailure: onFailure,
-    useSSL: true,
+    useSSL: false,
+    userName: user, // ← agregar
+    password: password, // ← agregar
   };
 
   client.connect(options);
@@ -104,11 +106,13 @@ function onConnect() {
   client.subscribe("smarthome/web/hum");
   client.subscribe("smarthome/web/luz1");
   client.subscribe("smarthome/web/luz2");
+  client.subscribe("smarthome/web/slide1");
+  client.subscribe("smarthome/web/slide2");
   client.subscribe("smarthome/web/caloventor");
   client.subscribe("smarthome/web/ventilador");
   client.subscribe("smarthome/web/alarma");
   addMessageToLog(
-    "Suscrito a temas: smarthome/web/temp, smarthome/web/hum, smarthome/web/luz1, smarthome/web/luz2, smarthome/web/caloventor, smarthome/web/ventilador, smarthome/web/alarma",
+    "Suscrito a temas: smarthome/web/temp, smarthome/web/hum, smarthome/web/luz1, smarthome/web/luz2, smarthome/web/slide1, smarthome/web/slide2, smarthome/web/caloventor, smarthome/web/ventilador, smarthome/web/alarma",
   );
 }
 
@@ -193,6 +197,19 @@ function onMessageArrived(message) {
         addMessageToLog("Estado de luz 2 => desconocido");
       }
       break;
+    case "smarthome/web/slide1":
+      actualizarSlider("sliderLuz1", "valorLuz1", message.payloadString);
+      addMessageToLog(
+        "Nivel de iluminación 1 => " + message.payloadString + "%",
+      );
+      break;
+
+    case "smarthome/web/slide2":
+      actualizarSlider("sliderLuz2", "valorLuz2", message.payloadString);
+      addMessageToLog(
+        "Nivel de iluminación 2 => " + message.payloadString + "%",
+      );
+      break;
     case "smarthome/web/caloventor":
       const caloventor = document.getElementById("caloventor");
       if (message.payloadString === "ON") {
@@ -231,11 +248,56 @@ function onMessageArrived(message) {
         addMessageToLog("Estado de ventilador => desconocido");
       }
       break;
+    // case ALM_DESARMADO:
+    //     return "ALM_DESARMADO";
+    // case ALM_ARMANDO:
+    //     return "ALM_ARMANDO";
+    // case ALM_ARMADO:
+    //     return "ALM_ARMADO";
+    // case ALM_IDENTIFICACION:
+    //     return "ALM_IDENTIFICACION";
+    // case ALM_ACTIVADO:
+    //     return "ALM_ACTIVADO";
+    // default:
+    //     return "DESCONOCIDO";
     case "smarthome/web/alarma":
-      if (message.payloadString === "ON") {
-        addMessageToLog("Estado de alarma => activada");
-      } else if (message.payloadString === "OFF") {
-        addMessageToLog("Estado de alarma => desactivada");
+      const alarma = document.getElementById("alarma");
+      const alarmClasses = [
+        "btn-danger",
+        "btn-success",
+        "btn-warning",
+        "btn-identification",
+        "btn-activated",
+      ];
+
+      // Helper para limpiar todas las clases de estado y aplicar una nueva
+      function setAlarmClass(cls) {
+        alarma.classList.remove(...alarmClasses);
+        alarma.classList.add(cls);
+      }
+
+      const alarmLabel = alarma.textContent.split(" ").slice(0, -1).join(" ");
+
+      if (message.payloadString === "DESARMADO") {
+        addMessageToLog("Estado de alarma => desarmada");
+        setAlarmClass("btn-danger");
+        alarma.textContent = alarmLabel + " desarmada";
+      } else if (message.payloadString === "ARMANDO") {
+        addMessageToLog("Estado de alarma => armando");
+        setAlarmClass("btn-warning");
+        alarma.textContent = alarmLabel + " armando...";
+      } else if (message.payloadString === "ARMADO") {
+        addMessageToLog("Estado de alarma => armada");
+        setAlarmClass("btn-success");
+        alarma.textContent = alarmLabel + " armada";
+      } else if (message.payloadString === "IDENTIFICACION") {
+        addMessageToLog("Estado de alarma => identificación");
+        setAlarmClass("btn-identification");
+        alarma.textContent = alarmLabel + " identificación";
+      } else if (message.payloadString === "ACTIVADO") {
+        addMessageToLog("Estado de alarma => ¡ACTIVADA!");
+        setAlarmClass("btn-activated");
+        alarma.textContent = alarmLabel + " ⚠ ACTIVADA";
       } else {
         addMessageToLog("Estado de alarma => desconocido");
       }
@@ -343,9 +405,6 @@ document
 document
   .getElementById("venti")
   .addEventListener("click", (e) => cambioEstado(e, "ventilador"));
-document
-  .getElementById("alarma")
-  .addEventListener("click", (e) => cambioEstado(e, "alarma"));
 //Falta ver como imlpementamos la configuracion de la alarma
 
 // Inicializar la aplicación
