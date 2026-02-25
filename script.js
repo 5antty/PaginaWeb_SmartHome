@@ -92,7 +92,17 @@ function connectToBroker() {
 
   client.connect(options);
 }
-
+const topics = [
+  "smarthome/web/temp",
+  "smarthome/web/hum",
+  "smarthome/web/luz1",
+  "smarthome/web/luz2",
+  "smarthome/web/slide1",
+  "smarthome/web/slide2",
+  "smarthome/web/caloventor",
+  "smarthome/web/ventilador",
+  "smarthome/web/alarma",
+];
 // Callback de conexión exitosa
 function onConnect() {
   isConnected = true;
@@ -100,18 +110,10 @@ function onConnect() {
   addMessageToLog("Conectado al broker MQTT");
 
   // Suscribirse a los temas
-  client.subscribe("smarthome/web/temp");
-  client.subscribe("smarthome/web/hum");
-  client.subscribe("smarthome/web/luz1");
-  client.subscribe("smarthome/web/luz2");
-  client.subscribe("smarthome/web/slide1");
-  client.subscribe("smarthome/web/slide2");
-  client.subscribe("smarthome/web/caloventor");
-  client.subscribe("smarthome/web/ventilador");
-  client.subscribe("smarthome/web/alarma");
-  addMessageToLog(
-    "Suscrito a temas: smarthome/web/temp, smarthome/web/hum, smarthome/web/luz1, smarthome/web/luz2, smarthome/web/slide1, smarthome/web/slide2, smarthome/web/caloventor, smarthome/web/ventilador, smarthome/web/alarma",
-  );
+  topics.forEach((topic) => {
+    client.subscribe(topic);
+    addMessageToLog("Suscrito a tema: " + topic);
+  });
 }
 
 // Callback de fallo de conexión
@@ -209,7 +211,7 @@ function onMessageArrived(message) {
       );
       break;
     case "smarthome/web/caloventor":
-      const caloventor = document.getElementById("caloventor");
+      const caloventor = document.getElementById("calo");
       if (message.payloadString === "ON") {
         addMessageToLog("Estado de caloventor => encendido");
         caloventor.classList.remove("btn-danger");
@@ -228,7 +230,7 @@ function onMessageArrived(message) {
       }
       break;
     case "smarthome/web/ventilador":
-      const ventilador = document.getElementById("ventilador");
+      const ventilador = document.getElementById("venti");
       if (message.payloadString === "ON") {
         addMessageToLog("Estado de ventilador => encendido");
         ventilador.classList.remove("btn-danger");
